@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>نظام التغذية — عبدالله</title>
+<meta name="theme-color" content="#0C1014">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0C1014;--panel:#141A21;--line:#1E2731;--line2:#26313D;--paper:#E6EDF3;--muted:#8395A6;--dim:#5C6C7C;--signal:#3FD39B;--amber:#F2A93C;--cyan:#5BB6E5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(900px 500px at 80% -10%,rgba(91,182,229,.08),transparent 60%),
+radial-gradient(700px 400px at 10% 110%,rgba(63,211,155,.06),transparent 60%),var(--ink);
+color:var(--paper);font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;line-height:1.65;
+min-height:100vh;display:flex;align-items:center;justify-content:center;padding:36px 16px}
+.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:520px;width:100%}
+.eyebrow{font-size:11px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:9px;font-weight:500}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--signal);box-shadow:0 0 9px var(--signal);animation:p 2.6s ease-in-out infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-size:clamp(26px,7vw,36px);font-weight:600;letter-spacing:-.02em;line-height:1.25}
+h1 span{color:var(--dim);font-weight:300}
+.sub{color:var(--muted);font-size:13.5px;margin-top:7px}
+.mac{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:22px 0}
+.mac>div{background:var(--panel);padding:11px 9px;text-align:center}
+.mac .k{font-size:9.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+.mac .v{font-size:17px;font-weight:600;margin-top:2px}
+a.card{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+padding:17px 18px;margin-bottom:11px;text-decoration:none;color:inherit;transition:.16s}
+a.card:hover{background:#19212A;border-color:var(--line2);transform:translateY(-1px)}
+.ico{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.ico.a{background:rgba(242,169,60,.13);border:1px solid rgba(242,169,60,.3)}
+.ico.b{background:rgba(63,211,155,.13);border:1px solid rgba(63,211,155,.3)}
+.card .t{font-size:16px;font-weight:600}
+.card .d{font-size:12.5px;color:var(--muted);margin-top:1px;line-height:1.5}
+.card .ar{margin-inline-start:auto;color:var(--dim);font-size:19px}
+footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--line);font-size:11.5px;color:var(--dim);line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">نظام تشغيل · تغذية</div>
+  <h1>النظام الغذائي <span>— عبدالله</span></h1>
+  <p class="sub">صيام متقطع ١٥ ساعة · لو-كارب معتدل · دورة ٤ أيام</p>
+
+  <div class="mac">
+    <div><div class="k">سعرات</div><div class="v num">1390</div></div>
+    <div><div class="k">بروتين</div><div class="v num">131</div></div>
+    <div><div class="k">كارب</div><div class="v num">82</div></div>
+    <div><div class="k">دهون</div><div class="v num">58</div></div>
+  </div>
+
+  <a class="card" href="tracker.html">
+    <div class="ico b">◉</div>
+    <div><div class="t">سجل التتبّع اليومي</div><div class="d">سجّل ما أكلته · مجموع لحظي · تقرير جاهز للنسخ</div></div>
+    <div class="ar">‹</div>
+  </a>
+
+  <a class="card" href="plan.html">
+    <div class="ico a">▤</div>
+    <div><div class="t">الخطة والتقويم</div><div class="d">وجبات الدورة · الوصفات · وحدات التبديل · المكمّلات</div></div>
+    <div class="ar">‹</div>
+  </a>
+
+  <footer>
+    البيانات محفوظة في متصفح هذا الجهاز فقط — لا تُزامَن بين الأجهزة.<br>
+    القيم الغذائية تقديرية ±١٥٪ · ليست استشارة طبية.
+  </footer>
+</div>
+</body>
+</html>
