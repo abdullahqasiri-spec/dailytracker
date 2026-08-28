@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة النظام الغذائي — عبدالله</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C1014; --panel:#141A21; --panel-2:#1B232C; --line:#26313D; --line-soft:#1E2731;
+  --paper:#E6EDF3; --muted:#8395A6; --dim:#5C6C7C;
+  --signal:#3FD39B; --amber:#F2A93C; --cyan:#5BB6E5; --rose:#E8746B; --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:radial-gradient(1100px 600px at 85% -8%,rgba(91,182,229,.07),transparent 60%),
+             radial-gradient(900px 500px at 5% 105%,rgba(63,211,155,.05),transparent 60%),var(--ink);
+  color:var(--paper);font-family:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
+  font-size:15px;line-height:1.65;padding:0 0 90px;min-height:100vh;
+}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+header{border-bottom:1px solid var(--line-soft);padding:26px 0 0;margin-bottom:26px}
+.eyebrow{font-size:11px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:8px;font-weight:500}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--signal);box-shadow:0 0 9px var(--signal);animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-size:clamp(25px,5.2vw,38px);font-weight:600;letter-spacing:-.02em;line-height:1.25}
+h1 span{color:var(--dim);font-weight:300}
+.sub{color:var(--muted);font-size:13.5px;margin-top:6px;max-width:62ch}
+
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;margin:22px 0 4px}
+.gauge{background:var(--panel);padding:13px 14px}
+.gauge .k{font-size:10.5px;letter-spacing:.13em;color:var(--dim);text-transform:uppercase;font-weight:500}
+.gauge .v{font-size:22px;font-weight:600;margin-top:3px;line-height:1.2}
+.gauge .u{font-size:11px;color:var(--muted);font-weight:400}
+.gauge.acc-g .v{color:var(--signal)} .gauge.acc-a .v{color:var(--amber)} .gauge.acc-c .v{color:var(--cyan)}
+
+.strip-box{margin:18px 0 24px;border:1px solid var(--line-soft);border-radius:var(--r);background:var(--panel);padding:14px 15px 11px}
+.strip-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px;flex-wrap:wrap;gap:6px}
+.strip-hd b{font-size:12.5px;font-weight:600}
+.strip-hd i{font-style:normal;font-size:11px;color:var(--dim);letter-spacing:.08em}
+.strip{direction:ltr;position:relative;height:34px;border-radius:6px;overflow:hidden;background:#0A0E12;border:1px solid var(--line-soft)}
+.strip .fast{position:absolute;inset:0;background:repeating-linear-gradient(115deg,#10161C 0 7px,#0C1116 7px 14px)}
+.strip .eat{position:absolute;top:0;bottom:0;background:linear-gradient(180deg,rgba(242,169,60,.30),rgba(242,169,60,.10));border-left:1px solid var(--amber);border-right:1px solid var(--amber)}
+.strip .tick{position:absolute;top:0;bottom:0;width:1.5px;background:var(--paper);opacity:.65}
+.strip .now{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--signal);box-shadow:0 0 10px var(--signal);z-index:3}
+.axis{direction:ltr;display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--dim)}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.btn{background:var(--panel-2);color:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 13px;font:inherit;font-size:13px;cursor:pointer;transition:.16s}
+.btn:hover{background:#232D38;border-color:#33414F}
+.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.mlabel{font-size:16px;font-weight:600;min-width:150px;text-align:center}
+.spacer{flex:1}
+.anchor{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.anchor input{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);border-radius:8px;padding:6px 9px;font:inherit;font-size:12.5px;color-scheme:dark}
+
+.cal{border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;background:var(--panel)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--panel-2);border-bottom:1px solid var(--line-soft)}
+.dow div{padding:9px 4px;text-align:center;font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line-soft)}
+.cell{background:var(--panel);min-height:88px;padding:7px 8px 8px;cursor:pointer;position:relative;transition:background .14s;border:0;font:inherit;color:inherit;text-align:right;display:flex;flex-direction:column;gap:5px}
+.cell:hover{background:#19212A}
+.cell:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
+.cell.out{background:#0F141A;cursor:default}
+.cell.out:hover{background:#0F141A}
+.cell .d{font-size:15px;font-weight:500}
+.cell.today .d{background:var(--signal);color:#07120D;border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-weight:700;margin-inline-start:-3px}
+.cell .cyc{font-size:10px;letter-spacing:.1em;color:var(--dim);font-weight:600}
+.cell .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;align-items:center}
+.tag{font-size:9.5px;padding:2px 6px;border-radius:4px;font-weight:600;line-height:1.5}
+.tag.prep{background:rgba(242,169,60,.15);color:var(--amber);border:1px solid rgba(242,169,60,.3)}
+.tag.weigh{background:rgba(91,182,229,.13);color:var(--cyan);border:1px solid rgba(91,182,229,.28)}
+.dots{display:flex;gap:3px}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--dim);display:block}
+.dots i.on{background:var(--signal)}
+
+.scrim{position:fixed;inset:0;background:rgba(5,8,11,.72);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:.22s;z-index:40}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;inset-block:0;inset-inline-start:0;width:min(600px,100%);background:var(--ink);border-inline-end:1px solid var(--line);transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:41;overflow-y:auto;overscroll-behavior:contain}
+.sheet.open{transform:translateX(0)}
+.sheet-hd{position:sticky;top:0;background:rgba(12,16,20,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-soft);padding:16px 20px;z-index:2}
+.sheet-hd .row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sheet-hd h2{font-size:19px;font-weight:600}
+.sheet-hd .meta{font-size:12px;color:var(--muted);margin-top:2px}
+.x{background:none;border:1px solid var(--line);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:17px;line-height:1;flex-shrink:0}
+.x:hover{color:var(--paper);border-color:#3A4855}
+.prog{height:3px;background:var(--line-soft);border-radius:2px;margin-top:13px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--signal);width:0;transition:width .3s;border-radius:2px}
+.prog-t{font-size:11px;color:var(--dim);margin-top:6px}
+
+.rail{padding:20px 20px 40px;position:relative}
+.rail::before{content:"";position:absolute;inset-inline-start:33px;top:32px;bottom:52px;width:1px;background:var(--line)}
+.node{position:relative;padding-inline-start:44px;margin-bottom:8px}
+.led{position:absolute;inset-inline-start:26px;top:13px;width:15px;height:15px;border-radius:50%;border:2px solid var(--line);background:var(--ink);cursor:pointer;padding:0;transition:.16s;z-index:2}
+.led:hover{border-color:var(--dim)}
+.led.on{background:var(--signal);border-color:var(--signal);box-shadow:0 0 11px rgba(63,211,155,.6)}
+.led:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.node.fast .led{border-style:dashed}
+.card{background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden}
+.card>.top{display:flex;gap:12px;align-items:flex-start;padding:11px 13px;cursor:pointer;user-select:none}
+.card>.top:hover{background:#19212A}
+.time{font-size:12.5px;font-weight:600;color:var(--amber);flex-shrink:0;min-width:52px;padding-top:1px}
+.node.fast .time{color:var(--dim)}
+.node.supp .time{color:var(--cyan)}
+.card .ttl{font-size:14px;font-weight:600;line-height:1.4}
+.card .sm{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.55}
+.chev{margin-inline-start:auto;color:var(--dim);font-size:11px;transition:transform .2s;flex-shrink:0;padding-top:4px}
+.card.open .chev{transform:rotate(180deg)}
+.body{display:none;border-top:1px solid var(--line-soft);padding:12px 13px;background:#10161C}
+.card.open .body{display:block}
+.body dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12.5px}
+.body dt{color:var(--dim);font-weight:500;white-space:nowrap}
+.body dd{color:var(--paper);line-height:1.6}
+.body .steps{margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
+.body .steps b{font-size:10.5px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;display:block;margin-bottom:7px}
+.body ol{padding-inline-start:17px;font-size:12.5px}
+.body ol li{margin-bottom:5px;line-height:1.6}
+.body ul.opts{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:3px}
+.body ul.opts li{font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:5px 9px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.body ul.opts li b{color:var(--paper);font-weight:500}
+.warn{margin-top:11px;font-size:12px;color:var(--amber);background:rgba(242,169,60,.08);border-inline-start:2px solid var(--amber);padding:8px 11px;border-radius:0 6px 6px 0;line-height:1.6}
+
+/* portion table inside a meal card */
+.pt{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:2px}
+.pt th{text-align:right;padding:5px 6px;color:var(--dim);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--line);font-weight:600;white-space:nowrap}
+.pt td{text-align:right;padding:6px;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.5}
+.pt td:first-child{width:38%}
+.pt .w{color:var(--cyan);font-weight:500;white-space:nowrap}
+.pt tfoot td{border-bottom:0;border-top:1px solid var(--line);font-weight:600;color:var(--signal);padding-top:7px}
+.raw{font-size:10px;color:var(--dim);display:block}
+
+.ref{margin-top:34px}
+.ref h3{font-size:12px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-bottom:13px;font-weight:600}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px}
+.tab{background:none;border:1px solid var(--line);color:var(--muted);border-radius:20px;padding:6px 15px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;transition:.16s}
+.tab:hover{color:var(--paper);border-color:#3A4855}
+.tab.on{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:600}
+.pane{display:none;border:1px solid var(--line-soft);border-radius:var(--r);background:var(--panel);padding:18px;margin-top:12px}
+.pane.on{display:block}
+.pane h4{font-size:15px;font-weight:600;margin:20px 0 9px}
+.pane h4:first-child{margin-top:0}
+.pane p{font-size:13.5px;color:var(--muted);margin-bottom:11px}
+table.g{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px}
+table.g th,table.g td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+table.g th{color:var(--dim);font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
+table.g tbody tr:last-child td{border-bottom:0}
+table.g tbody tr:hover{background:#19212A}
+.pane ul.plain{list-style:none;font-size:13.5px}
+.pane ul.plain li{padding:8px 0;border-bottom:1px solid var(--line-soft);display:flex;gap:10px;line-height:1.6}
+.pane ul.plain li:last-child{border-bottom:0}
+.pane ul.plain li::before{content:"—";color:var(--dim);flex-shrink:0}
+.kbd{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--cyan)}
+.unit-hd{background:rgba(63,211,155,.08);border:1px solid rgba(63,211,155,.25);border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:13px}
+.unit-hd b{color:var(--signal)}
+
+.disclaimer{margin-top:30px;border:1px solid rgba(232,116,107,.28);background:rgba(232,116,107,.06);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:#EFB3AD;line-height:1.7}
+.disclaimer b{color:var(--rose)}
+footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line-soft);font-size:11.5px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+@media (max-width:640px){
+  .wrap{padding:0 12px}
+  .cell{min-height:70px;padding:5px}
+  .cell .d{font-size:13px} .cell .cyc{font-size:9px}
+  .tag{font-size:8.5px;padding:1px 4px}
+  .sheet{width:100%;border:0}
+  .rail{padding:16px 10px 40px}
+  .rail::before{inset-inline-start:25px}
+  .led{inset-inline-start:18px}
+  .node{padding-inline-start:36px}
+  .body dl{grid-template-columns:1fr;gap:2px 0}
+  .body dt{margin-top:7px}
+  .pt{font-size:11px} .pt td{padding:5px 3px} .pt th{padding:4px 3px;font-size:9px}
+  table.g{font-size:12px} table.g th,table.g td{padding:7px 5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">خطة تشغيل · دورة ٤ أيام · أوزان لكل صنف</div>
+  <h1>لوحة النظام الغذائي <span>— عبدالله</span></h1>
+  <p class="sub">صيام متقطع ١٥ ساعة · لو-كارب معتدل · بروتين أولًا. كل صنف داخل الوجبة له وزنه وسعراته وبروتينه منفصلًا — للتبديل استخدم تبويب «وحدات التبديل».</p>
+
+  <div class="gauges">
+    <div class="gauge"><div class="k">الوزن الحالي</div><div class="v num">100 <span class="u">كجم</span></div></div>
+    <div class="gauge acc-g"><div class="k">الهدف</div><div class="v num">80–85 <span class="u">كجم</span></div></div>
+    <div class="gauge"><div class="k">الطول / BMI</div><div class="v num">171 <span class="u">سم · 34.2</span></div></div>
+    <div class="gauge acc-a"><div class="k">السعرات</div><div class="v num">1335–1429 <span class="u">kcal</span></div></div>
+    <div class="gauge acc-g"><div class="k">البروتين</div><div class="v num">127–135 <span class="u">غ</span></div></div>
+    <div class="gauge"><div class="k">الكارب الصافي</div><div class="v num">56–72 <span class="u">غ</span></div></div>
+    <div class="gauge"><div class="k">الدهون</div><div class="v num">49–71 <span class="u">غ</span></div></div>
+    <div class="gauge acc-c"><div class="k">الماء</div><div class="v num">2.5–3 <span class="u">لتر</span></div></div>
+    <div class="gauge"><div class="k">المدة المتوقعة</div><div class="v num">18–22 <span class="u">أسبوع</span></div></div>
+  </div>
+
+  <div class="strip-box">
+    <div class="strip-hd"><b>شريط اليوم — نافذة الأكل مقابل الصيام</b><i class="num" id="nowLabel">--:--</i></div>
+    <div class="strip">
+      <div class="fast"></div>
+      <div class="eat" style="left:54.17%;right:8.33%"></div>
+      <div class="tick" style="left:54.17%"></div><div class="tick" style="left:66.67%"></div>
+      <div class="tick" style="left:77.08%"></div><div class="tick" style="left:83.33%"></div>
+      <div class="tick" style="left:91.67%"></div>
+      <div class="now" id="nowMark" style="left:0"></div>
+    </div>
+    <div class="axis num"><span>00:00</span><span>06:00</span><span>12:00</span><span>13:00 فطور</span><span>18:00</span><span>22:00 عشاء</span></div>
+  </div>
+</header>
+
+<div class="bar">
+  <button class="btn" id="prev">التالي ‹</button>
+  <div class="mlabel" id="mlabel"></div>
+  <button class="btn" id="next">› السابق</button>
+  <button class="btn" id="todayBtn">اليوم</button>
+  <div class="spacer"></div>
+  <label class="anchor">بداية الدورة (يوم A): <input type="date" id="anchor"></label>
+</div>
+
+<div class="cal">
+  <div class="dow"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<section class="ref">
+  <h3>المراجع التشغيلية</h3>
+  <div class="tabs">
+    <button class="tab on" data-p="p0">وحدات التبديل</button>
+    <button class="tab" data-p="p1">خلطات البهارات</button>
+    <button class="tab" data-p="p2">الوصفات</button>
+    <button class="tab" data-p="p3">جلسة التجهيز</button>
+    <button class="tab" data-p="p4">المكمّلات</button>
+    <button class="tab" data-p="p5">قواعد الشهية</button>
+    <button class="tab" data-p="p6">المشتريات</button>
+    <button class="tab" data-p="p7">المتابعة</button>
+  </div>
+
+  <!-- P0 EXCHANGE UNITS -->
+  <div class="pane on" id="p0">
+    <div class="unit-hd">
+      نظام التبديل: كل صنف في الجدول أدناه <b>يعادل وحدة واحدة</b> من فئته. أي صنف يُستبدل بأي صنف آخر من نفس الجدول دون إعادة حساب — الفرق في السعرات مبيَّن لتختار الأخف عند الحاجة.
+    </div>
+
+    <h4>وحدة البروتين = ٢٥ غ بروتين</h4>
+    <p>الأوزان <b>نيئة</b>. الفقد بالطبخ: دجاج ولحم ٢٥٪ · سمك ٢٠٪.</p>
+    <table class="g">
+      <thead><tr><th>الصنف</th><th>الوزن النيء</th><th>بعد الطبخ</th><th>سعرات</th><th>دهون</th></tr></thead>
+      <tbody>
+        <tr><td><b>صدر دجاج</b> منزوع الجلد</td><td class="num">110 غ</td><td class="num">82 غ</td><td class="num">132</td><td class="num">3 غ</td></tr>
+        <tr><td><b>سمك أبيض</b> (هامور/ناجل)</td><td class="num">125 غ</td><td class="num">100 غ</td><td class="num">115</td><td class="num">1 غ</td></tr>
+        <tr><td><b>تونة</b> بالماء مصفّاة</td><td class="num">100 غ</td><td>—</td><td class="num">110</td><td class="num">1 غ</td></tr>
+        <tr><td><b>لحم مفروم</b> ١٠٪ دهن</td><td class="num">125 غ</td><td class="num">94 غ</td><td class="num">220</td><td class="num">12 غ</td></tr>
+        <tr><td><b>سلمون</b></td><td class="num">125 غ</td><td class="num">100 غ</td><td class="num">232</td><td class="num">15 غ</td></tr>
+        <tr><td><b>بيض كامل</b></td><td class="num">4 حبات (220 غ)</td><td>—</td><td class="num">290</td><td class="num">20 غ</td></tr>
+        <tr><td><b>زبادي يوناني</b> ٠٪</td><td class="num">250 غ</td><td>—</td><td class="num">148</td><td class="num">0 غ</td></tr>
+        <tr><td><b>جبن قليل الدسم</b></td><td class="num">105 غ</td><td>—</td><td class="num">190</td><td class="num">9 غ</td></tr>
+        <tr><td><b>بروتين باودر</b> (كولا)</td><td class="num">سكوب 31 غ</td><td>—</td><td class="num">124</td><td class="num">1 غ</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:8px;font-size:12.5px">الأرخص سعريًا لنفس البروتين: <b>سمك أبيض ← تونة ← دجاج</b>. الأغلى: <b>بيض ← سلمون ← لحم مفروم</b>. عند تبديل الدجاج بالسلمون في الغداء أنت تضيف ١٠٠ سعرة — اخصمها من زيت الوجبة (ملعقة زيت = ١٢٠ سعرة).</p>
+
+    <h4>وحدة الكارب = ٢٥ غ كارب</h4>
+    <table class="g">
+      <thead><tr><th>الصنف</th><th>الوزن</th><th>سعرات</th><th>بروتين</th></tr></thead>
+      <tbody>
+        <tr><td><b>رز أبيض</b> مطبوخ</td><td class="num">90 غ</td><td class="num">117</td><td class="num">2.4 غ</td></tr>
+        <tr><td><b>برغل</b> مطبوخ</td><td class="num">135 غ</td><td class="num">112</td><td class="num">4 غ</td></tr>
+        <tr><td><b>بطاطس</b> مسلوقة</td><td class="num">125 غ</td><td class="num">109</td><td class="num">2.5 غ</td></tr>
+        <tr><td><b>خبز أسمر</b></td><td class="num">شريحتان (58 غ)</td><td class="num">145</td><td class="num">6 غ</td></tr>
+        <tr><td><b>شوفان</b> جاف</td><td class="num">38 غ</td><td class="num">144</td><td class="num">5 غ</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:8px;font-size:12.5px">الرز والبطاطس <b>يُبرّدان ليلة كاملة</b> ثم يُسخّنان — يرفع النشا المقاوم ويخفض الاستجابة السكرية. البرغل أعلى ألياف وأبطأ امتصاصًا؛ فضّله في أيام العمل الطويلة.</p>
+
+    <h4>وحدة الدهون = ١٠ غ دهون</h4>
+    <table class="g">
+      <thead><tr><th>الصنف</th><th>الوزن</th><th>المكافئ المنزلي</th><th>سعرات</th></tr></thead>
+      <tbody>
+        <tr><td><b>زيت زيتون</b></td><td class="num">11 غ</td><td>¾ ملعقة كبيرة</td><td class="num">97</td></tr>
+        <tr><td><b>لوز</b></td><td class="num">18 غ</td><td>١٥ حبة</td><td class="num">104</td></tr>
+        <tr><td><b>زبدة فول سوداني</b> ١٠٠٪</td><td class="num">20 غ</td><td>ملعقة كبيرة ممسوحة</td><td class="num">120</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:8px;font-size:12.5px">الدهون هي أسرع مصدر لانفلات السعرات. <b>استخدم ملعقة قياس</b> ولا تصبّ الزيت مباشرة من العبوة — الصبّ الحر يعطي ٢–٣ أضعاف الكمية المقصودة.</p>
+
+    <h4>وحدة الخضار = ١٥٠ غ خضار غير نشوية</h4>
+    <p>≈ ٣٠ سعرة · ١.٥ غ بروتين · ٦ غ كارب. تشمل: خيار · طماطم · خس · كوسا · فلفل رومي · باذنجان · بروكلي · قرنبيط · سبانخ. <b>غير محسوبة:</b> يمكن زيادتها بحرية عند الجوع. <b>لا تشمل:</b> البطاطس والذرة والبازلاء — تُحسب كارب.</p>
+
+    <h4>ميزانية الوحدات اليومية</h4>
+    <table class="g">
+      <thead><tr><th>الوجبة</th><th>بروتين</th><th>كارب</th><th>دهون</th><th>خضار</th></tr></thead>
+      <tbody>
+        <tr><td>الفطور 13:00</td><td class="num">0.7</td><td class="num">0.8</td><td class="num">1.6</td><td class="num">1.0</td></tr>
+        <tr><td>سناك 1 · 16:00</td><td class="num">0.8</td><td class="num">0</td><td class="num">0.8</td><td class="num">0.7</td></tr>
+        <tr><td>الغداء 18:30</td><td class="num">1.5</td><td class="num">1.7</td><td class="num">1.3</td><td class="num">1.3</td></tr>
+        <tr><td>الشيك 20:00</td><td class="num">1.0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>العشاء 22:00</td><td class="num">1.1</td><td class="num">0</td><td class="num">0.9</td><td class="num">1.3</td></tr>
+      </tbody>
+      <tfoot><tr style="border-top:1px solid var(--line)"><td style="padding-top:8px"><b>الإجمالي</b></td><td class="num" style="padding-top:8px"><b>5.1</b></td><td class="num" style="padding-top:8px"><b>2.5</b></td><td class="num" style="padding-top:8px"><b>4.6</b></td><td class="num" style="padding-top:8px"><b>4.3</b></td></tr></tfoot>
+    </table>
+
+    <div class="warn" style="margin-top:14px">
+      <b>مفتاح التعديل:</b> الأوزان الحالية تعطي ١٣٣٠–١٤٣٠ سعرة، أي نزول متوقع ٠.٩–١.١ كجم أسبوعيًا. إن شعرت بهبوط طاقة في وردية الـ ١٢ ساعة أو تجاوز النزول ١.٢ كجم أسبوعيًا، <b>أضف وحدة كارب واحدة</b> إلى الغداء (+١١٠ سعرة). وإن توقف الوزن أسبوعين، اخصم <b>نصف وحدة دهون</b> (−٥٠ سعرة) قبل أي تغيير آخر.
+    </div>
+  </div>
+
+  <!-- P1 SPICES -->
+  <div class="pane" id="p1">
+    <p>تُجهّز مرة واحدة كل شهر في ٥ برطمانات. الكميات بالملعقة الكبيرة. الاستخدام: <b>١½ ملعقة صغيرة لكل ١٥٠ غ بروتين</b>.</p>
+    <table class="g">
+      <thead><tr><th>الخلطة</th><th>المكوّنات</th><th>تُستخدم مع</th></tr></thead>
+      <tbody>
+        <tr><td><b>١. المشوي</b></td><td>بابريكا حلوة ٣ · بودرة ثوم ٢ · بودرة بصل ٢ · أوريغانو ١ · فلفل أسود ١ · ملح ١</td><td>الدجاج، الخضار</td></tr>
+        <tr><td><b>٢. الشرقية</b></td><td>كمون ٣ · كزبرة ناشفة ٢ · بهار حلو ١ · قرفة ½ · فلفل أسود ١ · ملح ١</td><td>اللحم المفروم</td></tr>
+        <tr><td><b>٣. السمك الأبيض</b></td><td>سماق ٢ · بودرة ثوم ٢ · كزبرة ١ · كركم ١ · فلفل أبيض ١ · ملح ١</td><td>الهامور، الناجل</td></tr>
+        <tr><td><b>٤. الكاجن</b></td><td>بابريكا ٣ · بابريكا مدخّنة ١ · زعتر ١ · بودرة بصل ١ · فلفل حار ½ · ملح ١</td><td>السلمون، الدجاج</td></tr>
+        <tr><td><b>٥. الهندية</b></td><td>كاري ٢ · كركم ١ · كمون ١ · زنجبيل بودرة ١ · بودرة ثوم ١ · ملح ١</td><td>الدجاج، الخضار</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- P2 RECIPES -->
+  <div class="pane" id="p2">
+    <h4>الدجاج</h4>
+    <table class="g">
+      <thead><tr><th>الوصفة</th><th>الطريقة</th><th>الوقت</th></tr></thead>
+      <tbody>
+        <tr><td><b>صدور الفرن</b></td><td>افتح الصدر لشريحتين رفيعتين · زيت ١ ملعقة + خلطة المشوي ١½ ملعقة صغيرة + عصير نصف ليمونة · فرن ٢٢٠°م بدون قلب · غطّه ٥ دقائق قبل التقطيع</td><td class="num">18 د</td></tr>
+        <tr><td><b>دجاج هندي</b></td><td>مكعبات ٣ سم · مقلاة حارة بزيت ١ ملعقة ٦ دقائق · أضف الخلطة الهندية + ٣ ملاعق ماء + رشة زبادي · ٣ دقائق</td><td class="num">9 د</td></tr>
+        <tr><td><b>ليمون وثوم</b><br><span style="color:var(--dim);font-size:11.5px">يؤكل باردًا</span></td><td>مكعبات + ٣ فصوص ثوم مهروس + عصير ليمونة + فلفل أسود · مقلاة بزيت ١ ملعقة · يُبرّد</td><td class="num">8 د</td></tr>
+      </tbody>
+    </table>
+    <h4>اللحم المفروم</h4>
+    <table class="g">
+      <thead><tr><th>الوصفة</th><th>الطريقة</th><th>الوقت</th></tr></thead>
+      <tbody>
+        <tr><td><b>كفتة الفرن</b><br><span style="color:var(--dim);font-size:11.5px">٣٦٠ غ نيء → ١٢ قطعة (٣٠ غ للقطعة)</span></td><td>مفروم + بصلة مبشورة <b>معصورة جيدًا</b> + بقدونس + خلطة الشرقية ٢ ملعقة صغيرة · اعجن دقيقة واحدة فقط · أصابع على ورق زبدة · فرن ٢١٠°م</td><td class="num">15 د</td></tr>
+        <tr><td><b>سوتيه بالخضار</b></td><td>بصل + زيت ٢ دقيقة · اللحم مفتّتًا ٦ دقائق · خلطة الشرقية ٢ ملعقة صغيرة + معجون طماطم ١ ملعقة + ½ كوب ماء · فلفل رومي وكوسا ٧ دقائق بغطاء</td><td class="num">15 د</td></tr>
+      </tbody>
+    </table>
+    <h4>السمك — طازج يوم الاستهلاك</h4>
+    <table class="g">
+      <thead><tr><th>الوصفة</th><th>الطريقة</th><th>الوقت</th></tr></thead>
+      <tbody>
+        <tr><td><b>فيليه أبيض بالسماق</b></td><td><b>جفّف الفيليه بمنديل ورقي</b> — الرطوبة تمنع التحمير · زيت ١ ملعقة + خلطة السمك ١½ ملعقة صغيرة · شرائح ليمون + كزبرة · فرن ٢٠٠°م<br><span style="color:var(--dim);font-size:11.5px">بديل المقلاة: ٤ دقائق للوجه الأول دون تحريك + ٣ للثاني</span></td><td class="num">12 د</td></tr>
+        <tr><td><b>سلمون كاجن</b></td><td>جفّف القطعة + ملح خفيف · الخلطة على جهة اللحم فقط · مقلاة <b>حارة جدًا بدون زيت</b> — الجلد لأسفل ٥ دقائق · اقلبه ٢–٣ دقائق<br><span style="color:var(--amber);font-size:11.5px">لا تتجاوز ٨ دقائق — الزيادة تجعله جافًا وليفيًا</span></td><td class="num">8 د</td></tr>
+      </tbody>
+    </table>
+    <h4>الخضار والنشويات</h4>
+    <table class="g">
+      <thead><tr><th>الصنف</th><th>الطريقة</th><th>الوقت</th></tr></thead>
+      <tbody>
+        <tr><td>خضار الفرن</td><td>كوسا · فلفل · باذنجان · بروكلي + زيت ٢ ملعقة + خلطة المشوي ٢ ملعقة صغيرة — ٢٢٠°م</td><td class="num">22 د</td></tr>
+        <tr><td>خضار سوتيه</td><td>مقلاة حارة، زيت ١ ملعقة، ثوم، فلفل أسود، تقليب سريع</td><td class="num">5 د</td></tr>
+        <tr><td>الرز</td><td>كوب رز : ١¾ كوب ماء + هيل وورق غار — <b>تبريد ليلة كاملة</b></td><td class="num">18 د</td></tr>
+        <tr><td>البرغل</td><td>كوب برغل خشن : ٢ كوب مرق دجاج + بصل + كمون</td><td class="num">15 د</td></tr>
+        <tr><td>البطاطس</td><td>سلق مكعبات ثم <b>تبريد ١٢ ساعة</b> ثم تسخين</td><td class="num">12 د</td></tr>
+        <tr><td>الأومليت</td><td>لحظي — ٢ بيضة + كركم + فلفل أسود + بقدونس</td><td class="num">4 د</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- P3 PREP -->
+  <div class="pane" id="p3">
+    <p>جلسة واحدة كل ٤ أيام — <b>٩٥ دقيقة</b> بتشغيل متوازٍ بين الفرن والمقلاة.</p>
+    <table class="g">
+      <thead><tr><th>الوقت</th><th>المهمة</th><th>ملاحظة</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0:00</td><td>تسخين الفرن ٢٢٠°م + ماء الرز والبرغل</td><td>تشغيل متوازٍ</td></tr>
+        <tr><td class="num">0:05</td><td>تتبيل الدجاج وإدخاله الفرن</td><td>١٨ دقيقة</td></tr>
+        <tr><td class="num">0:10</td><td>تجهيز خليط الكفتة</td><td>—</td></tr>
+        <tr><td class="num">0:20</td><td>سلق البطاطس + ١٢ بيضة في نفس القدر</td><td>توفير وقت</td></tr>
+        <tr><td class="num">0:25</td><td>إخراج الدجاج · إدخال الكفتة</td><td>١٥ دقيقة</td></tr>
+        <tr><td class="num">0:30</td><td>دجاج هندي على المقلاة</td><td>٩ دقائق</td></tr>
+        <tr><td class="num">0:42</td><td>إخراج الكفتة · إدخال صينية الخضار</td><td>٢٢ دقيقة</td></tr>
+        <tr><td class="num">0:45</td><td>دجاج الليمون والثوم</td><td>٨ دقائق</td></tr>
+        <tr><td class="num">0:55</td><td>لحم مفروم سوتيه</td><td>١٥ دقيقة</td></tr>
+        <tr><td class="num">1:10</td><td>إخراج الخضار + تقطيع سلطة جافة</td><td>بدون تتبيل</td></tr>
+        <tr><td class="num">1:20</td><td><b>وزن وتقسيم العلب</b> — تبريد كامل قبل الإغلاق</td><td>استخدم ميزان مطبخ</td></tr>
+      </tbody>
+    </table>
+    <h4>تقسيم العلب حسب الوزن</h4>
+    <p>وزن كل علبة عند التقسيم — هذا ما يجعل الأوزان اليومية صحيحة دون وزن يومي.</p>
+    <table class="g">
+      <thead><tr><th>الصنف</th><th>لكل علبة</th><th>عدد العلب</th></tr></thead>
+      <tbody>
+        <tr><td>دجاج مطبوخ (غداء)</td><td class="num">113 غ</td><td class="num">2</td></tr>
+        <tr><td>دجاج مطبوخ (سناك/عشاء)</td><td class="num">60–98 غ</td><td class="num">3</td></tr>
+        <tr><td>لحم مفروم سوتيه</td><td class="num">150 غ نيء المطبوخ منه</td><td class="num">1</td></tr>
+        <tr><td>كفتة</td><td class="num">3–4 قطع</td><td class="num">2</td></tr>
+        <tr><td>رز مطبوخ</td><td class="num">150 غ</td><td class="num">1</td></tr>
+        <tr><td>برغل مطبوخ</td><td class="num">170–180 غ</td><td class="num">2</td></tr>
+        <tr><td>بطاطس مسلوقة</td><td class="num">180 غ</td><td class="num">1</td></tr>
+        <tr><td>خضار مشوية</td><td class="num">180 غ</td><td class="num">3</td></tr>
+      </tbody>
+    </table>
+    <h4>لا يدخل الجلسة</h4>
+    <ul class="plain">
+      <li>السمك الأبيض والسلمون — طازجان يوم الاستهلاك</li>
+      <li>الأومليت والشوفان — ٤ دقائق</li>
+      <li>تتبيل السلطة — تُقطّع جافة وتُتبّل عند التقديم</li>
+    </ul>
+    <h4>قواعد التخزين</h4>
+    <ul class="plain">
+      <li>الدجاج واللحم: ٤ أيام عند ٤°م أو أقل · البيض المسلوق ٥ أيام · الخضار ٤ أيام</li>
+      <li>لا تُغلق أي علبة ساخنة — البخار المحتبس يفسد الطعام خلال ٤٨ ساعة</li>
+      <li>التسخين: ميكروويف ٩٠ ثانية مع ملعقة صغيرة ماء</li>
+    </ul>
+  </div>
+
+  <!-- P4 SUPPLEMENTS -->
+  <div class="pane" id="p4">
+    <p>القهوة سادة لا تكسر الصيام، لكنها تخفض امتصاص الحديد <b>٥٠–٦٠٪</b>. آخر موعد للقهوة <span class="kbd">11:00</span>.</p>
+    <table class="g">
+      <thead><tr><th>الوقت</th><th>المكمّل</th><th>سبب التوقيت</th></tr></thead>
+      <tbody>
+        <tr><td class="num">حتى 11:00</td><td>☕ قهوة سادة فقط</td><td>لا مكمّلات أثناء الصيام</td></tr>
+        <tr><td class="num">12:30</td><td>ماغنيسيوم (اختياري)</td><td>فاصل ١.٥ ساعة عن القهوة</td></tr>
+        <tr><td class="num">13:00</td><td><b>B12</b> تحت اللسان</td><td>لا تعارض مع الألبان</td></tr>
+        <tr><td class="num">15:30</td><td><b>فايبر</b> + ٤٠٠ مل ماء</td><td>قبل السناك بـ ٣٠ دقيقة</td></tr>
+        <tr><td class="num">18:30</td><td><b>حديد + فيتامين C + أوميغا ٣</b></td><td>٧.٥ ساعة بعد آخر قهوة</td></tr>
+        <tr><td class="num">20:00</td><td><b>زنك</b></td><td>فاصل ١.٥ ساعة عن الحديد</td></tr>
+        <tr><td class="num">22:00</td><td><b>كالسيوم سيترات</b> (جرعة ١)</td><td>٣.٥ ساعة بعد الحديد</td></tr>
+        <tr><td class="num">23:30</td><td><b>كالسيوم ٢ + ماغنيسيوم</b></td><td>الماغنيسيوم يحسّن النوم</td></tr>
+      </tbody>
+    </table>
+    <h4>الصيغ والجرعات بعد التكميم</h4>
+    <table class="g">
+      <thead><tr><th>المكمّل</th><th>الجرعة اليومية</th><th>الصيغة المفضّلة</th></tr></thead>
+      <tbody>
+        <tr><td>B12</td><td class="num">500–1000 مكجم</td><td>تحت اللسان — امتصاص المعدة معطّل</td></tr>
+        <tr><td>الحديد</td><td class="num">45–60 مجم عنصري</td><td>بيسغليسينات — أقل إمساكًا</td></tr>
+        <tr><td>فيتامين C</td><td class="num">250–500 مجم</td><td>مع الحديد — يرفع الامتصاص ٢–٣ أضعاف</td></tr>
+        <tr><td>أوميغا ٣</td><td class="num">1000–2000 مجم</td><td>مع وجبة دهنية</td></tr>
+        <tr><td>الكالسيوم</td><td class="num">1200–1500 مجم</td><td><b>سيترات لا كربونات</b> · ٥٠٠–٦٠٠ مجم للجرعة</td></tr>
+        <tr><td>الزنك</td><td class="num">8–15 مجم</td><td>مع طعام — فوق ٢٥ مجم يستنزف النحاس</td></tr>
+        <tr><td>الماغنيسيوم</td><td class="num">300–400 مجم</td><td>جلايسينات أو سيترات</td></tr>
+        <tr><td>الفايبر</td><td class="num">5–10 غ</td><td>سيليوم + ٤٠٠ مل ماء إلزامي</td></tr>
+      </tbody>
+    </table>
+    <h4>الفواصل الثلاثة التي لا تُكسر</h4>
+    <ul class="plain">
+      <li>القهوة ← الحديد: <b>ساعتان</b></li>
+      <li>الحديد ← الكالسيوم: <b>٤ ساعات</b></li>
+      <li>الحديد ← الزنك: <b>ساعة ونصف</b></li>
+    </ul>
+    <div class="warn">حبوب خل التفاح غير مُدرجة عمدًا: تأثيرها على إنقاص الوزن ضعيف، وحمض إضافي على كم صغير يرفع خطر الارتجاع والتهاب البطانة. إن أصررت — كبسولات مغلّفة معويًا مع الغداء فقط، وتُوقف فورًا عند أي حرقة، بعد عرضها على طبيبك.</div>
+  </div>
+
+  <!-- P5 RULES -->
+  <div class="pane" id="p5">
+    <p>هذه القواعد تعالج الشكوى الأساسية — فتح الشهية بعد التكميم. الالتزام بها أهم من دقة السعرات.</p>
+    <table class="g">
+      <thead><tr><th>القاعدة</th><th>التنفيذ</th></tr></thead>
+      <tbody>
+        <tr><td><b>البروتين أولًا</b></td><td>لا تلمس النشويات قبل إنهاء حصة البروتين كاملة</td></tr>
+        <tr><td><b>فصل السوائل</b></td><td>توقف عن الشرب ٢٠ دقيقة قبل الوجبة واستأنف بعد ٤٥ دقيقة — الشرب أثناء الأكل يدفع الطعام خارج الكم ويلغي الشبع</td></tr>
+        <tr><td><b>مدة الوجبة</b></td><td>٢٠–٣٠ دقيقة · مضغ ٢٠–٢٥ مرة لكل لقمة</td></tr>
+        <tr><td><b>منع الرعي</b></td><td>لا أكل خارج الأوقات الخمسة — السبب الأول لاستعادة الوزن بعد التكميم</td></tr>
+        <tr><td><b>الوزن لا التقدير</b></td><td>ميزان مطبخ عند التقسيم. التقدير بالنظر يخطئ ٢٠–٤٠٪ ويلغي العجز بالكامل</td></tr>
+        <tr><td><b>السكريات السائلة</b></td><td>صفر — تمر من الكم دون شبع</td></tr>
+        <tr><td><b>الأطعمة اللينة عالية السكر</b></td><td>تُتجنب — لا تُفعّل إشارات الامتلاء</td></tr>
+        <tr><td><b>تمارين المقاومة</b></td><td>٣× أسبوعيًا — بدونها ستفقد ٢٥–٣٠٪ من النازل عضلًا</td></tr>
+        <tr><td><b>النوم</b></td><td>٧ ساعات كحد أدنى — أقل من ٦ يرفع الجريلين</td></tr>
+      </tbody>
+    </table>
+    <h4>بروتوكول نوبة الجوع</h4>
+    <ol style="padding-inline-start:18px;font-size:13.5px">
+      <li style="margin-bottom:6px">٥٠٠ مل ماء</li>
+      <li style="margin-bottom:6px">انتظار ٢٠ دقيقة</li>
+      <li style="margin-bottom:6px">إن استمر: أضف <b>وحدة خضار</b> (١٥٠ غ) — غير محسوبة</li>
+      <li>وإن استمر: <b>قدّم</b> السناك التالي بدلًا من إضافته فوق الخطة</li>
+    </ol>
+  </div>
+
+  <!-- P6 SHOPPING -->
+  <div class="pane" id="p6">
+    <p>قائمة دورة واحدة = ٤ أيام. الأوزان نيئة.</p>
+    <table class="g">
+      <thead><tr><th>الصنف</th><th>الكمية</th><th>يغطي</th></tr></thead>
+      <tbody>
+        <tr><td>صدور دجاج</td><td class="num">760 غ</td><td>غداء A · غداء D · سناك A · عشاء D</td></tr>
+        <tr><td>لحم مفروم ١٠٪</td><td class="num">360 غ</td><td>غداء B (١٥٠) · كفتة (٢١٠)</td></tr>
+        <tr><td>سمك أبيض</td><td class="num">170 غ</td><td>عشاء B — طازج</td></tr>
+        <tr><td>سلمون</td><td class="num">150 غ</td><td>غداء C — طازج</td></tr>
+        <tr><td>بيض</td><td class="num">10 حبات</td><td>فطور A · فطور C · سناك B</td></tr>
+        <tr><td>زبادي يوناني ٠٪</td><td class="num">440 غ</td><td>فطور B · فطور D · سناك C</td></tr>
+        <tr><td>جبن قليل الدسم</td><td class="num">30 غ</td><td>فطور C</td></tr>
+        <tr><td>تونة بالماء</td><td class="num">1 علبة</td><td>عشاء A</td></tr>
+        <tr><td>بروتين باودر (كولا)</td><td class="num">4 سكوب</td><td>شيك يومي</td></tr>
+        <tr><td>رز</td><td class="num">150 غ مطبوخ</td><td>غداء A</td></tr>
+        <tr><td>برغل خشن</td><td class="num">350 غ مطبوخ</td><td>غداء B · غداء D</td></tr>
+        <tr><td>بطاطس</td><td class="num">180 غ</td><td>غداء C</td></tr>
+        <tr><td>شوفان</td><td class="num">55 غ جاف</td><td>فطور B · فطور D</td></tr>
+        <tr><td>خبز أسمر</td><td class="num">شريحة</td><td>فطور A</td></tr>
+        <tr><td>حليب خالي الدسم</td><td class="num">150 مل</td><td>فطور D</td></tr>
+        <tr><td>لوز</td><td class="num">27 غ</td><td>سناك A · سناك C</td></tr>
+        <tr><td>زبدة فول سوداني ١٠٠٪</td><td class="num">20 غ</td><td>فطور B · فطور D</td></tr>
+        <tr><td>زيت زيتون</td><td class="num">≈ 140 مل</td><td>الدورة كاملة</td></tr>
+        <tr><td>خضار للفرن والسوتيه</td><td class="num">1.1 كجم</td><td>كوسا · فلفل · باذنجان · بروكلي</td></tr>
+        <tr><td>خضار السلطة</td><td class="num">1.4 كجم</td><td>خيار · طماطم · خس · جرجير</td></tr>
+        <tr><td>ليمون · ثوم · بصل · بقدونس · كزبرة</td><td>—</td><td>تتبيل</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- P7 FOLLOWUP -->
+  <div class="pane" id="p7">
+    <table class="g">
+      <thead><tr><th>البند</th><th>التكرار</th><th>ملاحظة</th></tr></thead>
+      <tbody>
+        <tr><td>الوزن</td><td>أسبوعيًا</td><td>نفس اليوم والوقت — صباحًا بعد الحمام</td></tr>
+        <tr><td>محيط الخصر</td><td>كل أسبوعين</td><td>مؤشر أدق من الميزان</td></tr>
+        <tr><td>فيريتين + CBC + تشبّع الترانسفيرين</td><td>كل ٣ أشهر</td><td>معايرة جرعة الحديد</td></tr>
+        <tr><td>B12 أو حمض الميثيل مالونيك</td><td>كل ٦ أشهر</td><td>الأدق بعد التكميم</td></tr>
+        <tr><td>فيتامين D + PTH + كالسيوم</td><td>كل ٦ أشهر</td><td>—</td></tr>
+        <tr><td>الزنك والنحاس</td><td>سنويًا</td><td>—</td></tr>
+        <tr><td>مراجعة الخطة</td><td>كل ٤ أسابيع</td><td>راجع «مفتاح التعديل» في تبويب الوحدات</td></tr>
+      </tbody>
+    </table>
+    <h4>قبل البدء</h4>
+    <ul class="plain">
+      <li>مراجعة فريق جراحة السمنة لاستبعاد توسّع الكم (Sleeve Dilation)</li>
+      <li>تحاليل أساسية: B12 · فيريتين · فيتامين D · HbA1c · TSH</li>
+    </ul>
+  </div>
+</section>
+
+<div class="disclaimer">
+  <b>تنبيه:</b> خطة تشغيلية بُنيت على المعلومات التي قدّمتها، وليست استشارة طبية. القيم الغذائية تقديرية بهامش ±٥٪ وتختلف حسب المصدر والقطعية. زيادة الوزن بعد التكميم تستدعي تقييمًا من فريق جراحة السمنة وأخصائي تغذية معتمد قبل تطبيق أي عجز سعري أو جرعات مكمّلات.
+</div>
+
+<footer>
+  <span>دورة ٤ أيام · نافذة أكل ٩ ساعات · صيام ١٥ ساعة</span>
+  <span id="saveNote">التقدّم يُحفظ في هذا المتصفح</span>
+</footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-hd">
+    <div class="row">
+      <div><h2 id="sheetTitle">—</h2><div class="meta" id="sheetMeta">—</div></div>
+      <button class="x" id="close" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="prog"><i id="progBar"></i></div>
+    <div class="prog-t" id="progTxt">0 من 0 مهمة</div>
+  </div>
+  <div class="rail" id="rail"></div>
+</aside>
+
+<script>
+var mem={};
+function get(k){try{return localStorage.getItem(k);}catch(e){return mem[k]||null;}}
+function set(k,v){try{localStorage.setItem(k,v);}catch(e){mem[k]=v;document.getElementById('saveNote').textContent='التقدّم مؤقت في هذه الجلسة';}}
+
+/* item = [الصنف, الوزن, kcal, بروتين] */
+var SNACKS=[
+ ['صدر دجاج بارد','100 غ نيء / 75 غ مطبوخ','120','23 غ'],
+ ['بيض مسلوق','2 حبة (110 غ)','145','12.6 غ'],
+ ['تونة بالماء مصفّاة','80 غ','88','20 غ'],
+ ['كفتة مشوية','3 قطع (90 غ نيء)','158','18 غ'],
+ ['زبادي يوناني ٠٪','170 غ','100','17 غ'],
+ ['لوز','15 غ (12 حبة)','87','3 غ']
+];
+
+var CYCLE=[
+{id:'A',prep:true,
+ b:{t:'أومليت + خبز أسمر',
+    it:[['بيض كامل','2 حبة (110 غ)','145','12.6 غ'],['زيت زيتون','7 غ (½ ملعقة كبيرة)','60','0'],['خبز أسمر','شريحة (30 غ)','75','3 غ'],['خيار + طماطم','150 غ','30','1.5 غ']],
+    tot:['310','17 غ'],
+    s:['اخفق البيضتين مع رشة كركم وفلفل أسود وبقدونس','مقلاة نون-ستيك على نار متوسطة — ٤ دقائق','ابدأ بالبيض قبل الخبز']},
+ s1:{t:'دجاج بارد + لوز',it:[['صدر دجاج مشوي','80 غ نيء / 60 غ مطبوخ','96','18 غ'],['لوز','15 غ','87','3 غ'],['خيار','100 غ','15','0.7 غ']],tot:['198','22 غ']},
+ l:{t:'دجاج مشوي + رز',
+    it:[['صدر دجاج','150 غ نيء / 113 غ مطبوخ','180','34 غ'],['رز أبيض مطبوخ','150 غ','195','4 غ'],['سلطة','200 غ','40','2 غ'],['زيت زيتون','14 غ (1 ملعقة كبيرة)','120','0']],
+    tot:['535','40 غ'],
+    s:['سخّن الدجاج — ميكروويف ٩٠ ثانية مع ملعقة ماء','سخّن الرز المبرّد','تبّل السلطة عند التقديم فقط']},
+ d:{t:'تونة + سلطة',
+    it:[['تونة بالماء مصفّاة','100 غ (علبة صغيرة)','110','25 غ'],['سلطة','200 غ','40','2 غ'],['زيت زيتون','10 غ (¾ ملعقة كبيرة)','88','0']],
+    tot:['238','27 غ'],
+    s:['صفِّ التونة جيدًا — ماء العلبة يضيف صوديوم','بدون نشويات']},
+ day:['1405','130 غ']},
+
+{id:'B',prep:false,
+ b:{t:'زبادي + شوفان',
+    it:[['زبادي يوناني ٠٪','170 غ','100','17 غ'],['شوفان جاف','30 غ','114','4 غ'],['زبدة فول سوداني ١٠٠٪','10 غ (½ ملعقة كبيرة)','60','2.5 غ']],
+    tot:['274','23 غ'],
+    s:['اخلط الشوفان الجاف مع الزبادي مباشرة','رشّة قرفة','ابدأ بالزبادي قبل الشوفان']},
+ s1:{t:'بيض مسلوق',it:[['بيض مسلوق','2 حبة (110 غ)','145','12.6 غ'],['خيار','100 غ','15','0.7 غ']],tot:['160','13 غ']},
+ l:{t:'لحم مفروم سوتيه + برغل',
+    it:[['لحم مفروم ١٠٪','150 غ نيء / 113 غ مطبوخ','264','30 غ'],['برغل مطبوخ','180 غ','150','5 غ'],['خضار سوتيه','180 غ','40','2 غ'],['زيت زيتون','10 غ','88','0']],
+    tot:['542','37 غ'],
+    s:['سخّن اللحم مع الخضار','سخّن البرغل','البروتين أولًا ثم البرغل']},
+ d:{t:'سمك أبيض + خضار',
+    it:[['فيليه سمك أبيض','170 غ نيء / 136 غ مطبوخ','156','34 غ'],['خضار سوتيه','200 غ','45','2 غ'],['زيت زيتون','10 غ','88','0']],
+    tot:['289','36 غ'],
+    s:['جفّف الفيليه بمنديل ورقي — أهم خطوة','مقلاة حارة: ٤ دقائق دون تحريك ثم ٣ دقائق','الخضار في نفس المقلاة بعد رفع السمك']},
+ day:['1389','134 غ']},
+
+{id:'C',prep:false,
+ b:{t:'بيض مسلوق + جبن',
+    it:[['بيض مسلوق','2 حبة (110 غ)','145','12.6 غ'],['جبن قليل الدسم','30 غ','54','7 غ'],['خضار طازجة','150 غ','30','1.5 غ'],['زيت زيتون','7 غ','60','0']],
+    tot:['289','21 غ'],
+    s:['البيض جاهز من جلسة التجهيز','بدون نشويات — تمهيد ليوم البطاطس']},
+ s1:{t:'زبادي + لوز',it:[['زبادي يوناني ٠٪','170 غ','100','17 غ'],['لوز','12 غ','70','2.5 غ']],tot:['170','20 غ']},
+ l:{t:'سلمون كاجن + بطاطس',
+    it:[['سلمون','150 غ نيء / 120 غ مطبوخ','278','30 غ'],['بطاطس مسلوقة مبرّدة','180 غ','157','4 غ'],['سلطة','200 غ','40','2 غ'],['زيت زيتون','7 غ','60','0']],
+    tot:['535','36 غ'],
+    s:['جفّف السلمون + ملح خفيف من الجهتين','خلطة الكاجن على جهة اللحم فقط','مقلاة حارة جدًا بدون زيت — الجلد لأسفل ٥ دقائق','اقلبه ٢–٣ دقائق ثم ارفعه'],
+    w:'لا تتجاوز ٨ دقائق إجمالًا. البطاطس يجب أن تكون مبرّدة ١٢ ساعة ثم مُسخّنة — وإلا ارتفعت استجابتها السكرية بنحو ٢٥٪.'},
+ d:{t:'كفتة + خضار مشوية',
+    it:[['كفتة (لحم مفروم)','120 غ نيء = 4 قطع','211','24 غ'],['خضار مشوية','180 غ','40','2 غ'],['زيت زيتون','7 غ','60','0']],
+    tot:['311','26 غ'],
+    s:['سخّن الكفتة في الفرن ٥ دقائق أو ميكروويف ٦٠ ثانية','بدون نشويات']},
+ day:['1429','127 غ']},
+
+{id:'D',prep:false,
+ b:{t:'شوفان بالحليب + زبادي',
+    it:[['شوفان جاف','30 غ','114','4 غ'],['حليب خالي الدسم','150 مل','52','5 غ'],['زبادي يوناني ٠٪','100 غ','59','10 غ'],['زبدة فول سوداني','10 غ','60','2.5 غ']],
+    tot:['285','21.5 غ'],
+    s:['اطبخ الشوفان بالحليب ٣ دقائق','أضف الزبادي بعد أن يهدأ — لا يُطبخ معه','قرفة أو كاكاو خام غير محلى للنكهة']},
+ s1:{t:'كفتة باردة',it:[['كفتة (لحم مفروم)','90 غ نيء = 3 قطع','158','18 غ'],['خيار','100 غ','15','0.7 غ']],tot:['173','19 غ']},
+ l:{t:'دجاج هندي + برغل',
+    it:[['صدر دجاج','140 غ نيء / 105 غ مطبوخ','168','32 غ'],['برغل مطبوخ','170 غ','141','5 غ'],['خضار مشوية','180 غ','40','2 غ'],['زيت زيتون','14 غ','120','0']],
+    tot:['469','39 غ'],
+    s:['سخّن الدجاج بصلصته','سخّن البرغل','البروتين أولًا']},
+ d:{t:'دجاج ليمون وثوم بارد',
+    it:[['دجاج ليمون وثوم','130 غ نيء / 98 غ مطبوخ','156','30 غ'],['سلطة','200 غ','40','2 غ'],['زيت زيتون','10 غ','88','0']],
+    tot:['284','32 غ'],
+    s:['يؤكل باردًا مباشرة — لا يحتاج تسخين','مضغ بطيء ٢٠–٢٥ مرة']},
+ day:['1335','135 غ']}
+];
+
+function ptable(items,tot){
+  var h='<table class="pt"><thead><tr><th>الصنف</th><th>وزن الحصة</th><th>سعرات</th><th>بروتين</th></tr></thead><tbody>';
+  items.forEach(function(r){h+='<tr><td>'+r[0]+'</td><td class="w num">'+r[1]+'</td><td class="num">'+r[2]+'</td><td class="num">'+r[3]+'</td></tr>';});
+  h+='</tbody><tfoot><tr><td>إجمالي الوجبة</td><td></td><td class="num">'+tot[0]+'</td><td class="num">'+tot[1]+'</td></tr></tfoot></table>';
+  return h;
+}
+
+function buildDay(cy){
+  var c=CYCLE[cy],T=[];
+  T.push({id:'wake',time:'الاستيقاظ',kind:'fast',ttl:'ماء ٤٠٠ مل',sm:'قبل القهوة مباشرة',dl:[['الهدف','بدء ترطيب اليوم — إجمالي ٢.٥–٣ لتر']]});
+  T.push({id:'coffee',time:'صباحًا',kind:'fast',ttl:'☕ قهوة سادة',sm:'آخر موعد ١١:٠٠ — لا مكمّلات أثناء الصيام',
+    dl:[['المسموح','قهوة سادة · شاي أخضر · ماء'],['الممنوع','سكر · حليب · محليات'],['السبب','القهوة تخفض امتصاص الحديد ٥٠–٦٠٪ — الإيقاف ١١:٠٠ يضمن فاصل ٧.٥ ساعة قبل حديد الغداء']]});
+  T.push({id:'mg1',time:'12:30',kind:'supp',ttl:'ماغنيسيوم (اختياري)',sm:'فاصل ١.٥ ساعة عن القهوة',dl:[['الصيغة','جلايسينات أو سيترات']]});
+
+  T.push({id:'b',time:'13:00',kind:'meal',ttl:'الفطور — '+c.b.t,sm:'خفيف · '+c.b.tot[0]+' kcal · '+c.b.tot[1]+' بروتين',
+    tbl:ptable(c.b.it,c.b.tot),steps:c.b.s,
+    warn:'ابدأ بالبروتين. مدة الوجبة ٢٠ دقيقة كاملة حتى لو بدت صغيرة — هذه الوجبة تدريب للمعدة، لا مجرد سعرات.'});
+  T.push({id:'b12',time:'13:00',kind:'supp',ttl:'B12 تحت اللسان',sm:'٥٠٠–١٠٠٠ مكجم',dl:[['السبب','امتصاص المعدة معطّل بعد التكميم']]});
+  T.push({id:'fib',time:'15:30',kind:'supp',ttl:'فايبر + ٤٠٠ مل ماء',sm:'قبل السناك بـ ٣٠ دقيقة',dl:[['الجرعة','٥–١٠ غ سيليوم'],['إلزامي','الماء — بدونه يسبب انسدادًا']]});
+  T.push({id:'s1',time:'16:00',kind:'meal',ttl:'سناك ١ — '+c.s1.t,sm:c.s1.tot[0]+' kcal · '+c.s1.tot[1]+' بروتين',
+    tbl:ptable(c.s1.it,c.s1.tot),opts:SNACKS});
+
+  T.push({id:'l',time:'18:30',kind:'meal',ttl:'الغداء — '+c.l.t,sm:'الوجبة الرئيسية · '+c.l.tot[0]+' kcal · '+c.l.tot[1]+' بروتين',
+    tbl:ptable(c.l.it,c.l.tot),steps:c.l.s,
+    warn:c.l.w||'أنهِ البروتين كاملًا قبل لمس النشويات. توقف عن الشرب ٢٠ دقيقة قبل الوجبة واستأنف بعد ٤٥ دقيقة.'});
+  T.push({id:'iron',time:'18:30',kind:'supp',ttl:'حديد + فيتامين C + أوميغا ٣',sm:'أهم توقيت في اليوم',
+    dl:[['الحديد','٤٥–٦٠ مجم عنصري — بيسغليسينات'],['فيتامين C','٢٥٠–٥٠٠ مجم'],['أوميغا ٣','١٠٠٠–٢٠٠٠ مجم مع دهون الوجبة']]});
+  T.push({id:'s2',time:'20:00',kind:'meal',ttl:'شيك البروتين (كولا)',sm:'124 kcal · 24 غ بروتين',
+    tbl:ptable([['بروتين باودر','سكوب 31 غ','124','24 غ'],['ماء','250 مل','0','0']],['124','24 غ']),
+    dl:[['ثابت يوميًا','يغطي فجوة البروتين قبل النوم']]});
+  T.push({id:'zn',time:'20:00',kind:'supp',ttl:'زنك',sm:'٨–١٥ مجم مع الشيك',dl:[['الفاصل','١.٥ ساعة عن الحديد'],['تحذير','فوق ٢٥ مجم يستنزف النحاس']]});
+
+  T.push({id:'d',time:'22:00',kind:'meal',ttl:'العشاء — '+c.d.t,sm:'بدون نشويات · '+c.d.tot[0]+' kcal · '+c.d.tot[1]+' بروتين',
+    tbl:ptable(c.d.it,c.d.tot),steps:c.d.s,
+    warn:'حذف النشويات مساءً يقلّل الارتجاع أثناء الاستلقاء — شائع جدًا بعد التكميم.'});
+  T.push({id:'ca1',time:'22:00',kind:'supp',ttl:'كالسيوم سيترات — جرعة ١',sm:'٥٠٠–٦٠٠ مجم',dl:[['الفاصل','٣.٥ ساعة بعد الحديد'],['الصيغة','سيترات وليس كربونات']]});
+  T.push({id:'ca2',time:'23:30',kind:'supp',ttl:'كالسيوم ٢ + ماغنيسيوم',sm:'قبل النوم',dl:[['الماغنيسيوم','٣٠٠–٤٠٠ مجم']]});
+  T.push({id:'fastStart',time:'22:00',kind:'fast',ttl:'بدء الصيام — ١٥ ساعة',sm:'لا أكل حتى ١:٠٠ ظهرًا',
+    dl:[['نوبة الجوع','٥٠٠ مل ماء ← ٢٠ دقيقة ← وحدة خضار ١٥٠ غ ← وإن استمر، قدّم السناك التالي']]});
+
+  if(c.prep) T.unshift({id:'prep',time:'التجهيز',kind:'meal',ttl:'⚙ جلسة تجهيز الدورة — ٩٥ دقيقة',sm:'وزن وتقسيم العلب في نهاية الجلسة',
+    dl:[['المخرجات','٧٦٠ غ دجاج · ٣٦٠ غ لحم مفروم · ١٠ بيضات · خضار ونشويات مقسّمة'],['خارج الجلسة','السمك والسلمون والأومليت والشوفان — لحظية']],
+    steps:['سخّن الفرن ٢٢٠°م وضع ماء الرز والبرغل','دجاج الفرن ١٨ دقيقة','الكفتة ١٥ دقيقة','صينية الخضار ٢٢ دقيقة','الدجاج الهندي ثم دجاج الليمون على المقلاة','اللحم المفروم سوتيه ١٥ دقيقة','وزن العلب بميزان المطبخ ثم التبريد الكامل قبل الإغلاق'],
+    warn:'الوزن عند التقسيم هو ما يجعل أوزان الأيام صحيحة دون وزن يومي. راجع جدول «تقسيم العلب حسب الوزن» في تبويب جلسة التجهيز.'});
+  return T;
+}
+
+var AR_M=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+var AR_D=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function parseISO(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+
+var today=new Date();today.setHours(0,0,0,0);
+var view=new Date(today.getFullYear(),today.getMonth(),1);
+var anchorISO=get('anchor')||iso(today);
+document.getElementById('anchor').value=anchorISO;
+
+function cycleOf(d){var a=parseISO(anchorISO);var diff=Math.round((d-a)/86400000);return((diff%4)+4)%4;}
+function doneCount(key,n){var c=0;for(var i=0;i<n.length;i++){if(get('t:'+key+':'+n[i].id)==='1')c++;}return c;}
+
+function render(){
+  document.getElementById('mlabel').textContent=AR_M[view.getMonth()]+' '+view.getFullYear();
+  var g=document.getElementById('grid');g.innerHTML='';
+  var start=new Date(view.getFullYear(),view.getMonth(),1).getDay();
+  var days=new Date(view.getFullYear(),view.getMonth()+1,0).getDate();
+  for(var i=0;i<start;i++){var e=document.createElement('div');e.className='cell out';g.appendChild(e);}
+  for(var d=1;d<=days;d++){
+    var dt=new Date(view.getFullYear(),view.getMonth(),d);
+    var key=iso(dt),cy=cycleOf(dt),tasks=buildDay(cy),done=doneCount(key,tasks);
+    var b=document.createElement('button');
+    b.className='cell'+(key===iso(today)?' today':'');
+    var tags='';
+    if(CYCLE[cy].prep)tags+='<span class="tag prep">تجهيز</span>';
+    if(dt.getDay()===5)tags+='<span class="tag weigh">قياس</span>';
+    var q=Math.ceil(tasks.length/4),dots='<span class="dots">';
+    for(var j=0;j<4;j++)dots+='<i class="'+(done>j*q&&done>0?'on':'')+'"></i>';
+    dots+='</span>';
+    b.innerHTML='<span class="d">'+d+'</span><span class="cyc">دورة '+CYCLE[cy].id+'</span><span class="tags">'+tags+dots+'</span>';
+    b.onclick=(function(k){return function(){openDay(k);};})(key);
+    g.appendChild(b);
+  }
+}
+
+function openDay(key){
+  var dt=parseISO(key),cy=cycleOf(dt),tasks=buildDay(cy),c=CYCLE[cy];
+  document.getElementById('sheetTitle').textContent=AR_D[dt.getDay()]+' '+dt.getDate()+' '+AR_M[dt.getMonth()];
+  document.getElementById('sheetMeta').textContent='دورة '+c.id+(c.prep?' · يوم تجهيز':'')+' · '+c.day[0]+' kcal · بروتين '+c.day[1]+(dt.getDay()===5?' · قياس الوزن':'');
+  var r=document.getElementById('rail');r.innerHTML='';
+  tasks.forEach(function(t){
+    var on=get('t:'+key+':'+t.id)==='1';
+    var n=document.createElement('div');n.className='node '+t.kind;
+    var dl='';if(t.dl){dl='<dl>';t.dl.forEach(function(p){dl+='<dt>'+p[0]+'</dt><dd>'+p[1]+'</dd>';});dl+='</dl>';}
+    var tb=t.tbl||'';
+    var st='';if(t.steps){st='<div class="steps"><b>الخطوات</b><ol>'+t.steps.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ol></div>';}
+    var op='';if(t.opts){op='<div class="steps"><b>بدائل السناك — بنفس الوزن والسعرات</b><ul class="opts">'+t.opts.map(function(s){return '<li><b>'+s[0]+'</b><span class="num">'+s[1]+' · '+s[2]+' kcal · '+s[3]+'</span></li>';}).join('')+'</ul></div>';}
+    var wn=t.warn?'<div class="warn">'+t.warn+'</div>':'';
+    var has=(dl||tb||st||op||wn);
+    n.innerHTML='<button class="led'+(on?' on':'')+'" aria-label="تمّت"></button>'+
+      '<div class="card"><div class="top"><span class="time num">'+t.time+'</span>'+
+      '<div><div class="ttl">'+t.ttl+'</div><div class="sm">'+t.sm+'</div></div>'+
+      (has?'<span class="chev">▼</span>':'')+'</div>'+
+      (has?'<div class="body">'+tb+dl+st+op+wn+'</div>':'')+'</div>';
+    var card=n.querySelector('.card'),led=n.querySelector('.led');
+    if(has)n.querySelector('.top').onclick=function(){card.classList.toggle('open');};
+    led.onclick=function(e){e.stopPropagation();var nv=led.classList.toggle('on');set('t:'+key+':'+t.id,nv?'1':'0');prog(key,tasks);render();};
+    r.appendChild(n);
+  });
+  prog(key,tasks);
+  document.getElementById('scrim').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  document.getElementById('close').focus();
+}
+function prog(key,tasks){
+  var d=doneCount(key,tasks);
+  document.getElementById('progBar').style.width=(d/tasks.length*100)+'%';
+  document.getElementById('progTxt').textContent=d+' من '+tasks.length+' مهمة';
+}
+function closeSheet(){document.getElementById('scrim').classList.remove('open');document.getElementById('sheet').classList.remove('open');}
+document.getElementById('close').onclick=closeSheet;
+document.getElementById('scrim').onclick=closeSheet;
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
+
+document.getElementById('prev').onclick=function(){view.setMonth(view.getMonth()-1);render();};
+document.getElementById('next').onclick=function(){view.setMonth(view.getMonth()+1);render();};
+document.getElementById('todayBtn').onclick=function(){view=new Date(today.getFullYear(),today.getMonth(),1);render();openDay(iso(today));};
+document.getElementById('anchor').onchange=function(){anchorISO=this.value||iso(today);set('anchor',anchorISO);render();};
+
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+    document.querySelectorAll('.pane').forEach(function(x){x.classList.remove('on');});
+    t.classList.add('on');document.getElementById(t.dataset.p).classList.add('on');
+  };
+});
+
+function tick(){
+  var n=new Date(),m=n.getHours()*60+n.getMinutes();
+  document.getElementById('nowMark').style.left=(m/1440*100)+'%';
+  document.getElementById('nowLabel').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+(m>=780&&m<1320?' · نافذة الأكل':' · صيام');
+}
+tick();setInterval(tick,30000);
+render();
+</script>
+</body>
+</html>

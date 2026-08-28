@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>سجل التتبّع اليومي — عبدالله</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0C1014;--panel:#141A21;--panel-2:#1B232C;--line:#26313D;--line-soft:#1E2731;
+--paper:#E6EDF3;--muted:#8395A6;--dim:#5C6C7C;--signal:#3FD39B;--amber:#F2A93C;--cyan:#5BB6E5;--rose:#E8746B;--r:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(1000px 500px at 85% -8%,rgba(91,182,229,.07),transparent 60%),var(--ink);
+color:var(--paper);font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;font-size:15px;line-height:1.6;padding:0 0 80px}
+.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header{padding:22px 0 16px;border-bottom:1px solid var(--line-soft);margin-bottom:18px}
+.eyebrow{font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:7px;font-weight:500}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--signal);box-shadow:0 0 9px var(--signal)}
+h1{font-size:clamp(22px,5vw,30px);font-weight:600;letter-spacing:-.02em}
+h1 span{color:var(--dim);font-weight:300}
+.datebar{display:flex;gap:9px;align-items:center;margin-top:14px;flex-wrap:wrap}
+input[type=date],input[type=text],input[type=number],select{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);
+border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;color-scheme:dark;max-width:100%}
+select{max-width:100%}
+.btn{background:var(--panel-2);color:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font:inherit;font-size:13.5px;cursor:pointer;transition:.15s}
+.btn:hover{background:#232D38;border-color:#3A4855}
+.btn.pri{background:var(--signal);color:#07120D;border-color:var(--signal);font-weight:600}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--rose);border-color:rgba(232,116,107,.35)}
+
+.mac{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+.mac>div{background:var(--panel);padding:12px 11px}
+.mac .k{font-size:10px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;font-weight:500}
+.mac .v{font-size:19px;font-weight:600;margin-top:2px;line-height:1.2}
+.mac .t{font-size:10.5px;color:var(--dim)}
+.mac .b{height:3px;background:var(--line-soft);border-radius:2px;margin-top:7px;overflow:hidden}
+.mac .b i{display:block;height:100%;border-radius:2px;transition:width .3s}
+.ok{color:var(--signal)} .over{color:var(--amber)} .way{color:var(--rose)}
+
+section{border:1px solid var(--line-soft);border-radius:var(--r);background:var(--panel);padding:15px;margin-bottom:14px}
+section h2{font-size:12px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;margin-bottom:12px;font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:0 0 auto}
+.grow{flex:1 1 160px;min-width:0}
+.hint{font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.6}
+.slot{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.slot button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:16px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer}
+.slot button.on{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:600}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:right;padding:7px 6px;color:var(--dim);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--line);font-weight:600}
+td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+td.x{width:30px}
+td.x button{background:none;border:0;color:var(--dim);cursor:pointer;font-size:15px;padding:2px 5px}
+td.x button:hover{color:var(--rose)}
+.slotlbl{font-size:10px;color:var(--amber);display:block}
+.empty{color:var(--dim);font-size:13px;text-align:center;padding:18px 0}
+
+.water{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.water button{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;font-size:15px;color:var(--dim)}
+.water button.on{background:rgba(91,182,229,.18);border-color:var(--cyan);color:var(--cyan)}
+.supps{display:flex;gap:6px;flex-wrap:wrap}
+.supps button{background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 11px;font:inherit;font-size:12px;cursor:pointer}
+.supps button.on{background:rgba(63,211,155,.13);border-color:var(--signal);color:var(--signal)}
+
+pre.rep{background:#0A0E12;border:1px solid var(--line);border-radius:8px;padding:12px;font-family:"IBM Plex Mono",monospace;
+font-size:11.5px;line-height:1.75;white-space:pre-wrap;color:var(--paper);max-height:340px;overflow:auto;direction:rtl;text-align:right}
+.hist td.d{color:var(--muted)}
+footer{font-size:11.5px;color:var(--dim);text-align:center;margin-top:20px}
+@media(max-width:520px){.mac{grid-template-columns:repeat(2,1fr)}table{font-size:12px}td,th{padding:6px 4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">سجل تتبّع · مدخول يومي</div>
+  <h1>سجل التتبّع <span>— عبدالله</span></h1>
+  <div class="datebar">
+    <input type="date" id="date">
+    <button class="btn" id="todayBtn">اليوم</button>
+    <span class="hint" style="margin:0">الهدف: 1390 kcal · 131 غ بروتين · 82 غ كارب · 58 غ دهون</span>
+  </div>
+</header>
+
+<div class="mac" id="mac"></div>
+<div class="hint" id="deficit" style="margin-bottom:14px"></div>
+
+<section>
+  <h2>إضافة صنف</h2>
+  <div class="slot" id="slots"></div>
+  <div class="row" style="margin-bottom:8px">
+    <select id="food" class="grow"></select>
+    <input type="number" id="amt" placeholder="الكمية" style="width:100px" step="1">
+    <span id="unit" class="hint" style="margin:0;min-width:26px"></span>
+    <button class="btn pri" id="add">إضافة</button>
+  </div>
+  <div class="row">
+    <input type="text" id="cn" placeholder="صنف يدوي" class="grow">
+    <input type="number" id="ck" placeholder="kcal" style="width:78px">
+    <input type="number" id="cp" placeholder="بروتين" style="width:82px">
+    <input type="number" id="cc" placeholder="كارب" style="width:74px">
+    <input type="number" id="cf" placeholder="دهون" style="width:74px">
+    <button class="btn" id="addc">إضافة يدوية</button>
+  </div>
+  <div class="hint">أوزان اللحوم والدجاج والسمك <b>نيئة</b>. لو وزنتها مطبوخة اقسم على 0.75 (دجاج/لحم) أو 0.8 (سمك) للحصول على الوزن النيء.</div>
+</section>
+
+<section>
+  <h2>أصناف اليوم</h2>
+  <table><thead><tr><th>الصنف</th><th>الكمية</th><th>kcal</th><th>ب</th><th>ك</th><th>د</th><th></th></tr></thead>
+  <tbody id="list"></tbody></table>
+</section>
+
+<section>
+  <h2>الماء — 8 × 350 مل</h2>
+  <div class="water" id="water"></div>
+  <div class="hint" id="wtxt"></div>
+</section>
+
+<section>
+  <h2>المكمّلات</h2>
+  <div class="supps" id="supps"></div>
+</section>
+
+<section>
+  <h2>تقرير اليوم</h2>
+  <div class="row" style="margin-bottom:10px">
+    <button class="btn pri" id="copy">نسخ التقرير</button>
+    <button class="btn danger" id="clear">مسح اليوم</button>
+  </div>
+  <pre class="rep" id="rep"></pre>
+  <div class="hint">انسخ التقرير وألصقه في المحادثة للحصول على التحليل والتصحيح.</div>
+</section>
+
+<section>
+  <h2>آخر ٧ أيام</h2>
+  <table class="hist"><thead><tr><th>اليوم</th><th>kcal</th><th>بروتين</th><th>كارب</th><th>دهون</th></tr></thead>
+  <tbody id="hist"></tbody></table>
+  <div class="hint" id="avg"></div>
+</section>
+
+<footer>البيانات محفوظة في هذا المتصفح فقط · القيم تقديرية ±١٥٪</footer>
+</div>
+
+<script>
+var T={kcal:1390,p:131,c:82,f:58},TDEE=2600;
+var mem={};
+function G(k){try{return localStorage.getItem(k)}catch(e){return mem[k]||null}}
+function S(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v}}
+
+/* per: الوزن المرجعي · kcal/p/c/f لهذا الوزن */
+var F=[
+['— اختر صنفًا —',0,0,0,0,0,''],
+['صدر دجاج (نيء)',100,120,23,0,2.6,'غ'],
+['لحم مفروم ١٠٪ (نيء)',100,176,20,0,10,'غ'],
+['سمك أبيض (نيء)',100,92,20,0,1,'غ'],
+['سلمون (نيء)',100,185,20,0,12,'غ'],
+['تونة بالماء مصفّاة',100,110,25,0,1,'غ'],
+['بيض كامل',100,143,12.6,1,9.9,'غ'],
+['زبادي يوناني ٠٪',100,59,10,3.6,0,'غ'],
+['جبن قليل الدسم',100,180,24,3,9,'غ'],
+['حليب خالي الدسم',100,35,3.4,5,0.1,'مل'],
+['رز مطبوخ',100,130,2.7,28,0.3,'غ'],
+['برغل مطبوخ',100,83,3,18.6,0.2,'غ'],
+['بطاطس مسلوقة',100,87,2,20,0.1,'غ'],
+['خبز أسمر',100,250,10,43,3.4,'غ'],
+['شوفان جاف',100,380,13,66,7,'غ'],
+['خضار / سلطة',100,20,1,4,0.2,'غ'],
+['زيت زيتون',10,88,0,0,10,'غ'],
+['لوز',10,58,2.1,2.2,5,'غ'],
+['زبدة فول سوداني',10,60,2.5,2,5,'غ'],
+['منجو (لحم صافٍ)',100,60,0.8,15,0.4,'غ'],
+['تمر',100,280,2,75,0.4,'غ'],
+['سلطة مكرونة بالمايونيز',100,215,3.5,18,15,'غ'],
+['شيك بروتين — سكوب',1,124,24,3,1,'حصة'],
+['PhD Smart Bar 64غ',1,249,21,22,8,'حصة'],
+['قهوة سادة',1,5,0,0,0,'كوب'],
+['قهوة بحليب',1,60,3,6,3,'كوب'],
+['سوبر البيك مشوي حراق',1,1035,63,90,48,'حصة'],
+['ساندوتش مسحب حراق',1,421,22,45,17,'حصة'],
+['فيليه دجاج مشوي دي لايت',1,248,20,26,7,'حصة'],
+['شاورما دجاج مشوي',1,300,20,30,10,'حصة'],
+['صوص ترتار صغير',1,170,0,2,18,'حصة'],
+['صلصة ثوم البيك صغير',1,150,0,2,16,'حصة'],
+['ريدبول 250 مل',1,118,0,29,0,'علبة'],
+['Propel / ماء',1,0,0,0,0,'علبة']
+];
+var SLOTS=['فطور','سناك ١','غداء','شيك','عشاء','خارج الخطة'];
+var SUPPS=['B12','فايبر','حديد+C','أوميغا3','زنك','كالسيوم ١','كالسيوم ٢','ماغنيسيوم'];
+
+var d=new Date(),cur=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+var slot='فطور';
+document.getElementById('date').value=cur;
+
+function load(k){try{return JSON.parse(G('log:'+k)||'[]')}catch(e){return[]}}
+function save(k,v){S('log:'+k,JSON.stringify(v))}
+
+var fs=document.getElementById('food');
+F.forEach(function(f,i){var o=document.createElement('option');o.value=i;o.textContent=f[0];fs.appendChild(o)});
+fs.onchange=function(){var f=F[+fs.value];document.getElementById('unit').textContent=f[6];
+  document.getElementById('amt').value=f[1]?(f[6]==='حصة'||f[6]==='كوب'||f[6]==='علبة'?1:f[1]):''};
+
+var sd=document.getElementById('slots');
+SLOTS.forEach(function(s){var b=document.createElement('button');b.textContent=s;
+  if(s===slot)b.className='on';
+  b.onclick=function(){slot=s;[].forEach.call(sd.children,function(x){x.className=''});b.className='on'};sd.appendChild(b)});
+
+function totals(items){var t={kcal:0,p:0,c:0,f:0};items.forEach(function(i){t.kcal+=i.k;t.p+=i.p;t.c+=i.c;t.f+=i.f});return t}
+function r1(n){return Math.round(n*10)/10}
+
+function draw(){
+  var items=load(cur),t=totals(items);
+  var m=document.getElementById('mac');
+  var defs=[['السعرات',t.kcal,T.kcal,'kcal',0],['البروتين',t.p,T.p,'غ',1],['الكارب',t.c,T.c,'غ',1],['الدهون',t.f,T.f,'غ',1]];
+  m.innerHTML=defs.map(function(x){
+    var pct=Math.min(x[1]/x[2]*100,100),ratio=x[1]/x[2];
+    var col=ratio<0.9?'var(--cyan)':(ratio<=1.1?'var(--signal)':(ratio<=1.35?'var(--amber)':'var(--rose)'));
+    var cls=ratio<0.9?'':(ratio<=1.1?'ok':(ratio<=1.35?'over':'way'));
+    return '<div><div class="k">'+x[0]+'</div><div class="v num '+cls+'">'+(x[4]?r1(x[1]):Math.round(x[1]))+
+      ' <span class="t">/ '+x[2]+' '+x[3]+'</span></div><div class="b"><i style="width:'+pct+'%;background:'+col+'"></i></div></div>';
+  }).join('');
+
+  var rem=T.kcal-t.kcal,def=TDEE-t.kcal;
+  document.getElementById('deficit').innerHTML=
+    (rem>0?'متبقٍ من الهدف: <b class="num ok">'+Math.round(rem)+'</b> kcal':'تجاوز الهدف بـ <b class="num over">'+Math.round(-rem)+'</b> kcal')+
+    ' · العجز عن الصيانة: <b class="num">'+Math.round(def)+'</b> kcal'+(def<0?' <span class="way">(فائض)</span>':'');
+
+  var L=document.getElementById('list');
+  if(!items.length){L.innerHTML='<tr><td colspan="7" class="empty">لا توجد أصناف بعد</td></tr>'}
+  else{L.innerHTML=items.map(function(i,ix){
+    return '<tr><td><span class="slotlbl">'+i.s+'</span>'+i.n+'</td><td class="num">'+i.q+'</td><td class="num">'+Math.round(i.k)+
+    '</td><td class="num">'+r1(i.p)+'</td><td class="num">'+r1(i.c)+'</td><td class="num">'+r1(i.f)+
+    '</td><td class="x"><button data-i="'+ix+'">✕</button></td></tr>'}).join('');
+    [].forEach.call(L.querySelectorAll('button'),function(b){b.onclick=function(){
+      var a=load(cur);a.splice(+b.dataset.i,1);save(cur,a);draw()}})}
+
+  var w=+(G('w:'+cur)||0),wd=document.getElementById('water');
+  wd.innerHTML='';
+  for(var j=1;j<=8;j++){(function(n){var b=document.createElement('button');b.textContent='💧';
+    if(n<=w)b.className='on';b.onclick=function(){S('w:'+cur,n===w?n-1:n);draw()};wd.appendChild(b)})(j)}
+  document.getElementById('wtxt').textContent=(w*350/1000).toFixed(2)+' لتر من 2.8';
+
+  var sv=(G('s:'+cur)||'').split(','),sc=document.getElementById('supps');
+  sc.innerHTML='';
+  SUPPS.forEach(function(s){var b=document.createElement('button');b.textContent=s;
+    if(sv.indexOf(s)>-1)b.className='on';
+    b.onclick=function(){var a=(G('s:'+cur)||'').split(',').filter(Boolean);
+      var k=a.indexOf(s);if(k>-1)a.splice(k,1);else a.push(s);S('s:'+cur,a.join(','));draw()};sc.appendChild(b)});
+
+  report(items,t,w,sv);
+  history();
+}
+
+function report(items,t,w,sv){
+  var L=['تقرير '+cur,'──────────────────────────'];
+  SLOTS.forEach(function(s){
+    var g=items.filter(function(i){return i.s===s});
+    if(!g.length)return;
+    var gt=totals(g);
+    L.push('▸ '+s+'  ['+Math.round(gt.kcal)+' kcal · '+r1(gt.p)+' غ ب]');
+    g.forEach(function(i){L.push('   • '+i.n+' — '+i.q+' → '+Math.round(i.k)+' kcal / '+r1(i.p)+'ب / '+r1(i.c)+'ك / '+r1(i.f)+'د')});
+  });
+  L.push('──────────────────────────');
+  L.push('الإجمالي : '+Math.round(t.kcal)+' kcal   (الهدف '+T.kcal+')');
+  L.push('بروتين  : '+r1(t.p)+' غ   (الهدف '+T.p+')');
+  L.push('كارب    : '+r1(t.c)+' غ   (الهدف '+T.c+')');
+  L.push('دهون    : '+r1(t.f)+' غ   (الهدف '+T.f+')');
+  L.push('العجز عن الصيانة : '+Math.round(TDEE-t.kcal)+' kcal');
+  L.push('الماء : '+(w*350/1000).toFixed(2)+' لتر');
+  L.push('المكمّلات : '+(sv.filter(Boolean).length?sv.filter(Boolean).join(' · '):'لا شيء'));
+  document.getElementById('rep').textContent=L.join('\n');
+}
+
+function history(){
+  var rows=[],sum={kcal:0,p:0,c:0,f:0},n=0;
+  for(var i=0;i<7;i++){
+    var dt=new Date(cur);dt.setDate(dt.getDate()-i);
+    var k=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    var it=load(k);if(!it.length){continue}
+    var t=totals(it);n++;sum.kcal+=t.kcal;sum.p+=t.p;sum.c+=t.c;sum.f+=t.f;
+    rows.push('<tr><td class="d num">'+k.slice(5)+'</td><td class="num">'+Math.round(t.kcal)+'</td><td class="num">'+r1(t.p)+
+      '</td><td class="num">'+r1(t.c)+'</td><td class="num">'+r1(t.f)+'</td></tr>');
+  }
+  document.getElementById('hist').innerHTML=rows.length?rows.join(''):'<tr><td colspan="5" class="empty">لا يوجد سجل بعد</td></tr>';
+  document.getElementById('avg').textContent=n?('متوسط '+n+' أيام: '+Math.round(sum.kcal/n)+' kcal · '+r1(sum.p/n)+' غ بروتين · نزول متوقع '+
+    (((TDEE-sum.kcal/n)*7)/7700).toFixed(2)+' كجم/أسبوع'):'';
+}
+
+document.getElementById('add').onclick=function(){
+  var f=F[+fs.value],q=parseFloat(document.getElementById('amt').value);
+  if(!+fs.value||!q||q<=0)return;
+  var r=q/f[1],a=load(cur);
+  a.push({s:slot,n:f[0],q:q+' '+f[6],k:f[2]*r,p:f[3]*r,c:f[4]*r,f:f[5]*r});
+  save(cur,a);fs.value=0;document.getElementById('amt').value='';document.getElementById('unit').textContent='';draw()};
+
+document.getElementById('addc').onclick=function(){
+  var n=document.getElementById('cn').value.trim(),k=+document.getElementById('ck').value||0;
+  if(!n)return;
+  var a=load(cur);
+  a.push({s:slot,n:n,q:'—',k:k,p:+document.getElementById('cp').value||0,c:+document.getElementById('cc').value||0,f:+document.getElementById('cf').value||0});
+  save(cur,a);['cn','ck','cp','cc','cf'].forEach(function(x){document.getElementById(x).value=''});draw()};
+
+document.getElementById('copy').onclick=function(){
+  var t=document.getElementById('rep').textContent,b=this;
+  function done(){b.textContent='تم النسخ ✓';setTimeout(function(){b.textContent='نسخ التقرير'},1600)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fb)}else fb();
+  function fb(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+    try{document.execCommand('copy');done()}catch(e){b.textContent='حدّد النص يدويًا'}document.body.removeChild(a)}};
+
+document.getElementById('clear').onclick=function(){
+  if(!confirm('مسح كل أصناف '+cur+'؟'))return;
+  save(cur,[]);S('w:'+cur,0);S('s:'+cur,'');draw()};
+
+document.getElementById('date').onchange=function(){cur=this.value;draw()};
+document.getElementById('todayBtn').onclick=function(){
+  var n=new Date();cur=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+  document.getElementById('date').value=cur;draw()};
+
+draw();
+</script>
+</body>
+</html>
